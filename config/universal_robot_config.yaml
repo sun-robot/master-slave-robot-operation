@@ -1,0 +1,232 @@
+# 通用机械臂配置文件
+# 支持多种机械臂品牌和型号的主从控制配置
+
+# 系统配置
+system:
+  control_frequency: 50.0  # Hz
+  safety_timeout: 5.0      # 安全超时时间(秒)
+  emergency_stop_enabled: true
+  logging_level: "INFO"
+
+# 主机械臂配置
+master_robot:
+  # 支持的机械臂类型
+  unitree_d1:
+    type: "unitree_d1"
+    simulation:
+      xml_path: "assets/d1_550/mujoco/d1_550.xml"
+      headless: false
+      render_mode: "human"
+    hardware:
+      ip_address: "192.168.1.100"
+      port: 8080
+      timeout: 10.0
+  
+  ur3e:
+    type: "ur3e"
+    simulation:
+      urdf_path: "assets/ur3e/urdf/ur3e.urdf"
+      use_pinocchio: true
+    hardware:
+      node_name: "ur3e_controller"
+      ros_namespace: "/ur3e"
+  
+  ur5:
+    type: "ur5"
+    simulation:
+      urdf_path: "assets/ur5/urdf/ur5.urdf"
+      use_pinocchio: true
+    hardware:
+      node_name: "ur5_controller"
+      ros_namespace: "/ur5"
+  
+  ur10:
+    type: "ur10"
+    simulation:
+      urdf_path: "assets/ur10/urdf/ur10.urdf"
+      use_pinocchio: true
+    hardware:
+      node_name: "ur10_controller"
+      ros_namespace: "/ur10"
+  
+  franka_panda:
+    type: "franka_panda"
+    simulation:
+      urdf_path: "assets/franka_panda/urdf/panda.urdf"
+      use_pinocchio: true
+    hardware:
+      ip_address: "172.16.0.2"
+      timeout: 10.0
+
+# 从机械臂配置
+slave_robot:
+  # 配置与主机械臂相同，但可以有不同的参数
+  unitree_d1:
+    type: "unitree_d1"
+    simulation:
+      xml_path: "assets/d1_550/mujoco/d1_550.xml"
+      headless: true  # 从端通常不需要可视化
+      render_mode: "human"
+    hardware:
+      ip_address: "192.168.1.101"
+      port: 8080
+      timeout: 10.0
+  
+  ur3e:
+    type: "ur3e"
+    simulation:
+      urdf_path: "assets/ur3e/urdf/ur3e.urdf"
+      use_pinocchio: true
+    hardware:
+      node_name: "ur3e_slave_controller"
+      ros_namespace: "/ur3e_slave"
+  
+  ur5:
+    type: "ur5"
+    simulation:
+      urdf_path: "assets/ur5/urdf/ur5.urdf"
+      use_pinocchio: true
+    hardware:
+      node_name: "ur5_slave_controller"
+      ros_namespace: "/ur5_slave"
+  
+  ur10:
+    type: "ur10"
+    simulation:
+      urdf_path: "assets/ur10/urdf/ur10.urdf"
+      use_pinocchio: true
+    hardware:
+      node_name: "ur10_slave_controller"
+      ros_namespace: "/ur10_slave"
+  
+  franka_panda:
+    type: "franka_panda"
+    simulation:
+      urdf_path: "assets/franka_panda/urdf/panda.urdf"
+      use_pinocchio: true
+    hardware:
+      ip_address: "172.16.0.3"
+      timeout: 10.0
+
+# 主从控制配置
+master_slave_control:
+  # 默认配置
+  default_master: "unitree_d1"
+  default_slave: "ur3e"
+  default_master_mode: "simulation"
+  default_slave_mode: "hardware"
+  
+  # 空间变换配置
+  transform:
+    # 默认变换矩阵 [x, y, z, rx, ry, rz]
+    default: [0.1, 0.1, 0.0, 0.0, 0.0, 0.0]
+    
+    # 不同机械臂组合的特定变换
+    unitree_d1_to_ur3e: [0.15, 0.1, 0.0, 0.0, 0.0, 0.0]
+    unitree_d1_to_ur5: [0.12, 0.08, 0.0, 0.0, 0.0, 0.0]
+    franka_to_ur3e: [0.2, 0.15, 0.0, 0.0, 0.0, 0.0]
+  
+  # 控制模式配置
+  control_modes:
+    position:
+      velocity_scale: 0.5
+      acceleration_scale: 0.5
+      blocking: false
+    velocity:
+      gain: 0.5
+      max_velocity: 0.2
+    force:
+      max_force: 10.0
+      max_torque: 5.0
+
+# 安全约束配置
+safety_constraints:
+  # 关节限位
+  joint_limits:
+    enabled: true
+    margin: 0.1  # 安全边距(弧度)
+  
+  # 工作空间限制
+  workspace_limits:
+    enabled: true
+    # 笛卡尔空间限制 [x_min, x_max, y_min, y_max, z_min, z_max]
+    bounds: [-1.0, 1.0, -1.0, 1.0, 0.0, 1.5]
+    margin: 0.1  # 安全边距(米)
+  
+  # 速度限制
+  velocity_limits:
+    enabled: true
+    max_joint_velocity: 1.0  # rad/s
+    max_cartesian_velocity: 0.5  # m/s
+  
+  # 加速度限制
+  acceleration_limits:
+    enabled: true
+    max_joint_acceleration: 2.0  # rad/s²
+    max_cartesian_acceleration: 1.0  # m/s²
+  
+  # 碰撞检测
+  collision_detection:
+    enabled: true
+    safety_distance: 0.1  # 米
+    check_frequency: 10.0  # Hz
+
+# 网络配置
+network:
+  # ROS配置
+  ros:
+    master_uri: "http://localhost:11311"
+    node_name_prefix: "master_slave_"
+    timeout: 10.0
+  
+  # TCP/IP配置
+  tcp:
+    connection_timeout: 5.0
+    read_timeout: 1.0
+    write_timeout: 1.0
+  
+  # 实时通信配置
+  realtime:
+    priority: 80
+    cpu_affinity: [0, 1]
+    buffer_size: 1024
+
+# 日志配置
+logging:
+  level: "INFO"
+  file: "logs/master_slave.log"
+  max_size: "10MB"
+  backup_count: 5
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# 性能配置
+performance:
+  # 控制循环配置
+  control_loop:
+    frequency: 50.0  # Hz
+    max_latency: 0.02  # 秒
+  
+  # 内存配置
+  memory:
+    max_heap_size: "1GB"
+    gc_threshold: 1000
+  
+  # 线程配置
+  threads:
+    control_thread_priority: "HIGH"
+    io_thread_priority: "NORMAL"
+    max_worker_threads: 4
+
+# 调试配置
+debug:
+  enabled: false
+  verbose: false
+  save_trajectories: true
+  trajectory_file: "trajectories/master_slave_trajectory.json"
+  
+  # 可视化配置
+  visualization:
+    enabled: true
+    show_trajectories: true
+    show_workspace: true
+    show_safety_zones: true 

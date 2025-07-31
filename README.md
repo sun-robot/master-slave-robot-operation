@@ -1,13 +1,21 @@
-# 力反馈主从控制系统
+# 跨机械臂主从控制系统
 
-基于Unitree D1机械臂的主从协调控制系统，支持力反馈和实时控制。
+基于通用机械臂接口的跨品牌主从协调控制系统，支持力反馈和实时控制。
 
 ## 🚀 快速开始
 
 ### 环境要求
 - Python 3.8+
 - Ubuntu 20.04+
-- 1台Unitree D1机械臂 1台其它机械臂
+- 支持多种机械臂品牌和型号
+
+### 支持的机械臂
+- **Unitree**: D1机械臂
+- **Universal Robots**: UR3e, UR5, UR10系列
+- **Franka**: Panda机械臂
+- **KUKA**: IIWA系列
+- **ABB**: IRB系列
+- **自定义机械臂**: 支持自定义URDF模型
 
 ### 安装依赖
 ```bash
@@ -19,8 +27,8 @@ pip install -r requirements.txt
 # 基本主从控制
 python demo_master_slave.py
 
-# 指定机械臂ID
-python demo_master_slave.py --master-id 1 --slave-id 2
+# 指定机械臂类型
+python demo_master_slave.py --master-type unitree_d1 --slave-type ur3e
 
 # 设置运行时长
 python demo_master_slave.py --duration 60
@@ -41,17 +49,18 @@ python demo_master_slave.py --duration 60
 
 ## 🔧 核心功能
 
-- **主从控制**: 实时跟随主机械臂运动
+- **跨品牌主从控制**: 支持不同品牌机械臂之间的主从协调
 - **力反馈**: 支持力传感器数据反馈
 - **安全约束**: 内置安全限制和保护机制
-- **多机器人支持**: 支持多种机械臂型号
+- **多机器人支持**: 支持多种机械臂型号和品牌
+- **统一接口**: 提供标准化的机械臂控制接口
 
 ## ⚙️ 配置选项
 
 | 参数 | 说明 | 默认值 |
 |------|------|--------|
-| `--master-id` | 主机械臂ID | 1 |
-| `--slave-id` | 从机械臂ID | 2 |
+| `--master-type` | 主机械臂类型 | unitree_d1 |
+| `--slave-type` | 从机械臂类型 | ur3e |
 | `--duration` | 运行时长(秒) | 无限制 |
 | `--transform` | 空间变换参数 | [0,0,0,0,0,0] |
 
@@ -61,6 +70,7 @@ python demo_master_slave.py --duration 60
 - 数据有效性检查
 - 紧急停止功能
 - 连接状态监控
+- 跨品牌安全约束
 
 ## 📚 文档概览
 
