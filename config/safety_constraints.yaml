@@ -1,0 +1,48 @@
+# 主从机械臂安全约束配置
+# 定义机械臂的安全工作空间边界
+
+# 工作空间边界（相对于base_link坐标系）
+workspace_limits:
+  # X轴范围（前后方向）
+  x: [-0.8, 0.8]
+  # Y轴范围（左右方向）
+  y: [-0.8, 0.8]
+  # Z轴范围（上下方向，最小值为0防止碰撞地面）
+  z: [0.0, 1.2]
+
+# 安全约束开关
+safety_enabled: true
+
+# 约束类型
+constraints:
+  # Z轴最小高度约束
+  min_z_height: true
+  # 工作空间边界约束
+  workspace_limits: true
+  # 关节限位约束
+  joint_limits: true
+  # 速度限制约束
+  velocity_limits: true
+
+# 警告阈值
+warnings:
+  # 接近边界时的警告阈值（百分比）
+  boundary_warning_threshold: 0.9
+  # 接近地面时的警告阈值（米）
+  ground_warning_threshold: 0.1
+
+# 紧急停止条件
+emergency_stop:
+  # 是否启用紧急停止
+  enabled: true
+  # 超出安全范围时是否紧急停止
+  stop_on_boundary_violation: true
+  # 接近地面时是否紧急停止
+  stop_on_ground_approach: false
+
+# 日志设置
+logging:
+  # 是否记录安全约束日志
+  enabled: true
+  # 日志级别：DEBUG, INFO, WARNING, ERROR
+  level: "WARNING" 

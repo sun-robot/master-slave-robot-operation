@@ -1,0 +1,110 @@
+# D1Arm机械臂配置文件
+
+# 机械臂基本信息
+robot_info:
+  name: "D1Arm"
+  manufacturer: "Unitree"
+  model: "D1Arm"
+  dof: 7
+  arm_length: 0.951  # 总臂长 (m)
+  payload_capacity: 5.0  # 最大负载 (kg)
+  repeatability: 0.02  # 重复精度 (mm)
+  workspace_radius: 0.8  # 工作空间半径 (m)
+  base_height: 0.1625  # 基座高度 (m)
+
+# DH参数 (a, alpha, d, theta)
+dh_params:
+  - [0.0, -1.5708, 0.1625, 0.0]      # 关节1
+  - [0.0, 1.5708, 0.0, 0.0]          # 关节2
+  - [0.0, -1.5708, 0.425, 0.0]       # 关节3
+  - [0.0, 1.5708, 0.0, 0.0]          # 关节4
+  - [0.0, -1.5708, 0.3922, 0.0]      # 关节5
+  - [0.0, 1.5708, 0.0, 0.0]          # 关节6
+  - [0.0, 0.0, 0.1333, 0.0]          # 关节7
+
+# 关节限位 (弧度)
+joint_limits:
+  - [-3.1416, 3.1416]    # 关节1: ±180°
+  - [-1.5708, 1.5708]    # 关节2: ±90°
+  - [-3.1416, 3.1416]    # 关节3: ±180°
+  - [-1.5708, 1.5708]    # 关节4: ±90°
+  - [-3.1416, 3.1416]    # 关节5: ±180°
+  - [-1.5708, 1.5708]    # 关节6: ±90°
+  - [-3.1416, 3.1416]    # 关节7: ±180°
+
+# 关节速度限制 (rad/s)
+joint_velocity_limits:
+  - 2.0  # 关节1
+  - 2.0  # 关节2
+  - 2.0  # 关节3
+  - 2.0  # 关节4
+  - 2.0  # 关节5
+  - 2.0  # 关节6
+  - 2.0  # 关节7
+
+# 关节加速度限制 (rad/s²)
+joint_acceleration_limits:
+  - 5.0  # 关节1
+  - 5.0  # 关节2
+  - 5.0  # 关节3
+  - 5.0  # 关节4
+  - 5.0  # 关节5
+  - 5.0  # 关节6
+  - 5.0  # 关节7
+
+# 控制参数
+control:
+  frequency: 100.0  # 控制频率 (Hz)
+  dt: 0.01  # 时间步长 (s)
+  max_iterations: 100  # 最大迭代次数
+  tolerance: 0.001  # 收敛容差
+
+# 运动学参数
+kinematics:
+  ik_method: "optimization"  # 逆运动学方法: "jacobian", "optimization"
+  jacobian_damping: 0.1  # 雅可比阻尼系数
+  optimization_max_iter: 1000  # 优化最大迭代次数
+
+# 轨迹规划参数
+trajectory:
+  smoothing_factor: 0.1  # 轨迹平滑因子
+  min_segment_time: 0.1  # 最小段时长 (s)
+  max_velocity_scaling: 0.8  # 最大速度缩放因子
+  max_acceleration_scaling: 0.8  # 最大加速度缩放因子
+
+# 主从控制参数
+master_slave:
+  position_scaling: 1.0  # 位置缩放因子
+  orientation_scaling: 1.0  # 姿态缩放因子
+  force_scaling: 1.0  # 力反馈缩放因子
+  velocity_scaling: 1.0  # 速度缩放因子
+
+# 可视化参数
+visualization:
+  figure_size: [12, 8]  # 图形大小
+  animation_interval: 100  # 动画间隔 (ms)
+  trajectory_color: "orange"  # 轨迹颜色
+  robot_color: "blue"  # 机械臂颜色
+  workspace_alpha: 0.1  # 工作空间透明度
+
+# 安全参数
+safety:
+  max_joint_velocity: 2.0  # 最大关节速度 (rad/s)
+  max_joint_acceleration: 5.0  # 最大关节加速度 (rad/s²)
+  collision_check: true  # 碰撞检测
+  emergency_stop: true  # 紧急停止
+
+# 通信参数
+communication:
+  ros_enabled: false  # 是否启用ROS
+  tcp_port: 8080  # TCP端口
+  udp_port: 8081  # UDP端口
+  timeout: 5.0  # 超时时间 (s)
+
+# 日志参数
+logging:
+  level: "INFO"  # 日志级别
+  file_enabled: true  # 是否保存到文件
+  console_enabled: true  # 是否输出到控制台
+  max_file_size: 10  # 最大文件大小 (MB)
+  backup_count: 5  # 备份文件数量 

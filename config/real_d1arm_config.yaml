@@ -1,0 +1,199 @@
+# 真实D1机械臂主从控制配置文件
+# 适用于两台真实的Unitree D1机械臂硬件
+
+# 主机械臂配置
+master_robot:
+  id: "master_d1arm"
+  name: "主D1机械臂"
+  arm_id: 1                 # SDK通信中的机械臂ID
+  
+  # 连接配置
+  connection:
+    type: "sdk"             # 连接类型: sdk (使用Unitree SDK2)
+    ip: "192.168.1.101"     # 机械臂IP地址
+    port: 8080              # 通信端口
+    timeout: 5.0            # 连接超时时间(秒)
+    retry_attempts: 3       # 重试次数
+    
+  # 控制参数
+  control:
+    max_velocity: 0.2       # 最大速度 (m/s)
+    max_acceleration: 0.5   # 最大加速度 (m/s²)
+    position_tolerance: 0.001  # 位置精度(m)
+    
+  # 安全限制
+  safety:
+    workspace_limits:
+      x_min: -0.6
+      x_max: 0.6
+      y_min: -0.6
+      y_max: 0.6
+      z_min: 0.05
+      z_max: 0.9
+    joint_velocity_limit: 2.0  # rad/s
+    emergency_stop_deceleration: 10.0  # m/s²
+
+# 从机械臂配置
+slave_robot:
+  id: "slave_d1arm"
+  name: "从D1机械臂"
+  arm_id: 2                 # SDK通信中的机械臂ID
+  
+  # 连接配置
+  connection:
+    type: "sdk"             # 连接类型: sdk (使用Unitree SDK2)
+    ip: "192.168.1.102"     # 从机械臂IP地址
+    port: 8080
+    timeout: 5.0
+    retry_attempts: 3
+    
+  # 控制参数
+  control:
+    max_velocity: 0.2
+    max_acceleration: 0.5
+    position_tolerance: 0.001
+    
+  # 安全限制
+  safety:
+    workspace_limits:
+      x_min: -0.6
+      x_max: 0.6
+      y_min: -0.6
+      y_max: 0.6
+      z_min: 0.05
+      z_max: 0.9
+    joint_velocity_limit: 2.0
+    emergency_stop_deceleration: 10.0
+
+# 主从控制配置
+master_slave_control:
+  # 控制频率
+  control_frequency: 50.0   # Hz (真实硬件建议使用较低频率)
+  
+  # 主从空间变换
+  transform:
+    # 从机械臂相对于主机械臂的位置(m)
+    translation:
+      x: 0.0    # X方向偏移(右侧1米)
+      y: 0.0    # Y方向偏移
+      z: 0.0    # Z方向偏移
+    
+    # 从机械臂相对于主机械臂的旋转(度)
+    rotation:
+      roll: 0.0    # 绕X轴旋转
+      pitch: 0.0   # 绕Y轴旋转
+      yaw: 0.0     # 绕Z轴旋转(可设为180使两臂面对面)
+  
+  # 缩放因子
+  scaling:
+    position: 1.0           # 位置缩放(1.0=等比例)
+    orientation: 1.0        # 姿态缩放
+    velocity: 0.5           # 速度缩放(建议保守设置)
+    
+  # 滤波参数
+  filtering:
+    position_buffer_size: 5      # 位置滤波缓冲区大小
+    enable_smoothing: true       # 启用平滑滤波
+    smoothing_factor: 0.1        # 平滑因子(0-1)
+
+# 安全配置
+safety:
+  # 误差限制
+  max_position_error: 0.05      # 最大位置误差(m)
+  max_orientation_error: 0.1    # 最大姿态误差(rad)
+  max_velocity: 0.15            # 最大运动速度(m/s)
+  max_acceleration: 0.3         # 最大加速度(m/s²)
+  
+  # 监控参数
+  monitoring_frequency: 10.0    # 安全监控频率(Hz)
+  error_recovery_enabled: true  # 启用错误恢复
+  auto_emergency_stop: true     # 自动紧急停止
+  
+  # 碰撞检测
+  collision_detection:
+    enabled: true
+    force_threshold: 10.0       # 力阈值(N)
+    torque_threshold: 5.0       # 力矩阈值(Nm)
+
+# 演示配置
+demo:
+  # 程序化运动演示
+  programmed_motion:
+    # 演示轨迹点
+    trajectory_points:
+      - position: [0.3, 0.0, 0.4]    # 前方
+        duration: 3.0
+      - position: [0.2, 0.2, 0.5]    # 右前上方
+        duration: 3.0
+      - position: [0.0, 0.3, 0.3]    # 右侧
+        duration: 3.0
+      - position: [-0.2, 0.2, 0.5]   # 右后上方
+        duration: 3.0
+      - position: [-0.3, 0.0, 0.4]   # 后方
+        duration: 3.0
+      - position: [0.0, 0.0, 0.4]    # 中心
+        duration: 3.0
+    
+    # 固定姿态(四元数 [w,x,y,z])
+    fixed_orientation: [0.0, 1.0, 0.0, 0.0]  # 垂直向下
+    
+    # 运动参数
+    velocity_scale: 0.3         # 速度缩放
+    acceleration_scale: 0.3     # 加速度缩放
+    pause_between_points: 2.0   # 点间停顿时间(秒)
+
+# 日志配置
+logging:
+  level: "INFO"                 # 日志级别: DEBUG, INFO, WARNING, ERROR
+  console_output: true          # 控制台输出
+  file_output: true             # 文件输出
+  log_file: "d1arm_master_slave.log"
+  max_file_size: 10             # 最大文件大小(MB)
+  backup_count: 5               # 备份文件数量
+  
+  # 格式配置
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+
+# 网络配置
+network:
+  # 网络接口
+  interface: "eth0"             # 网络接口名称
+  
+  # 超时设置
+  connection_timeout: 10.0      # 连接超时(秒)
+  read_timeout: 1.0             # 读取超时(秒)
+  write_timeout: 1.0            # 写入超时(秒)
+  
+  # 重连设置
+  auto_reconnect: true          # 自动重连
+  reconnect_interval: 5.0       # 重连间隔(秒)
+  max_reconnect_attempts: 3     # 最大重连次数
+
+# 调试配置
+debug:
+  enable_debug_mode: false      # 启用调试模式
+  print_status_frequency: 2.0   # 状态打印频率(秒)
+  save_trajectory: true         # 保存轨迹数据
+  trajectory_file: "trajectory_data.csv"
+  
+  # 性能监控
+  performance_monitoring: true
+  timing_statistics: true       # 记录时序统计
+  memory_monitoring: false      # 内存监控
+
+# 标定配置  
+calibration:
+  # 自动标定
+  auto_calibration: false       # 启动时自动标定
+  calibration_method: "joint"   # 标定方法: joint, cartesian
+  
+  # 标定参数
+  joint_calibration:
+    home_position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # 零位
+    calibration_speed: 0.1      # 标定速度
+    
+  # 坐标系标定
+  coordinate_calibration:
+    reference_points: 3         # 参考点数量
+    precision_requirement: 0.001 # 精度要求(m) 
